@@ -206,15 +206,15 @@ NOTE: Only the **buffer local** value of VARIABLE will be set."
                                        ((integerp spec) (* spec size))
                                        (t spec))))))))))))))
 
-(defun edconf-set-line-ending (end-of-line)
-  "Set line ending style to CR, LF, or CRLF"
+(defun edconf-set-charset (charset end-of-line)
+  "Set character encoding"
   (set-buffer-file-coding-system
-   (cond
-    ((equal end-of-line "lf") 'undecided-unix)
-    ((equal end-of-line "cr") 'undecided-mac)
-    ((equal end-of-line "crlf") 'undecided-dos)
-    (t 'undecided))
-   nil t))
+    (cond
+      ((equal end-of-line "lf") (intern-soft (concat charset "-unix")))
+      ((equal end-of-line "cr") (intern-soft (concat charset "-mac")))
+      ((equal end-of-line "crlf") (intern-soft (concat charset "-dos")))
+      (t (intern-soft (concat charset "-auto")))
+      nil t))
 
 (defun edconf-set-trailing-nl (final-newline)
   (cond
@@ -281,7 +281,8 @@ NOTE: Only the **buffer local** value of VARIABLE will be set."
       (edconf-set-indentation (gethash 'indent_style props)
                               (gethash 'indent_size props)
                               (gethash 'tab_width props))
-      (edconf-set-line-ending (gethash 'end_of_line props))
+      (edconf-set-charset     (gethash 'charset props)
+                              (gethash 'end_of_line props))
       (edconf-set-trailing-nl (gethash 'insert_final_newline props))
       (edconf-set-trailing-ws (gethash 'trim_trailing_whitespace props))
       (edconf-set-line-length (gethash 'max_line_length props))
